@@ -5,6 +5,12 @@
 
 ### Запуск через Docker
 
+### 1. Собрать Docker-образ:
+
+```bash
+docker build -t xui-cleaner .
+```
+### 2. Запустить контейнер:
 ```bash
 docker run -d \
   --name xui-cleaner \
