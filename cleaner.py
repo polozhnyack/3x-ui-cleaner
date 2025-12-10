@@ -121,7 +121,6 @@ class XUIcleaner:
         return deleted
 
 
-
     def _delete_by_email(self) -> dict:
         if not self.email:
             return {"inbound_client_ips": 0, "client_traffics": 0}

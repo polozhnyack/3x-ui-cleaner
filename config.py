@@ -1,7 +1,20 @@
-from dotenv import load_dotenv
-import os
+import sqlite3
 
-load_dotenv()  # подтягивает .env
+DB_PATH = "/etc/x-ui/x-ui.db"
 
-API_TOKEN = os.getenv("API_TOKEN")
-DB_PATH = os.getenv("DB_PATH")
+DB_PATH = "x-ui.db"
+
+
+
+conn = sqlite3.connect(DB_PATH)
+cur = conn.cursor()
+
+cur.execute("SELECT value FROM settings WHERE key = 'webBasePath'")
+row = cur.fetchone()
+
+if row and row[0]:
+    API_TOKEN = row[0].strip("/")
+else:
+    API_TOKEN = None
+
+conn.close()

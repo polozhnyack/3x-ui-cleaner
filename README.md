@@ -1,90 +1,50 @@
-# Сервис XUI Cleaner
+# 3x-ui-cleaner
 
-Сервис для удаления забаганных пользователей в панели **3x-ui**.
-Правит базу данных **локально на хосте** через SQLite.
+**X-ui-cleaner** — сервис для очистки базы данных **3x-ui** от забаганных пользователей, возникающих при ошибках типа `record not found` и других.
 
-### Запуск через Docker
+## Установка
 
-### 1. Собрать Docker-образ:
+Развертывание происходит одной командой:
 
 ```bash
-docker build -t xui-cleaner .
-```
-### 2. Запустить контейнер:
-```bash
-docker run -d \
-  --name xui-cleaner \
-  --env-file .env \
-  -p 8000:8000 \
-  -v /etc/x-ui:/etc/x-ui \
-  --restart=unless-stopped \
-  xui-cleaner
+curl -fsSL https://raw.githubusercontent.com/polozhnyack/X-ui-cleaner/main/deploy.sh | bash
 ```
 
-* `--env-file .env` — содержит переменные окружения:
+Сервис развертывается на **порту 8000**.
 
-  ```env
-  DB_PATH=/etc/x-ui/x-ui.db
-  API_KEY=super-secret-key
-  ```
-* `-v /etc/x-ui:/etc/x-ui` — монтируем папку с базой внутрь контейнера.
-* `--restart=unless-stopped` — контейнер автоматически перезапускается после сбоя или перезагрузки хоста.
+## Пример запроса
 
-### Эндпоинт для удаления клиента
+```python
+import requests
 
-```http
-DELETE /deleteclient
+resp = requests.delete(
+    "http://{you_ip_server}:8000/deleteclient",
+    headers={"Content-Type": "application/json", "X-API-Key": "You_WebPath"},
+    json={"identifier": "user@example.com"},
+    timeout=5
+)
+print(resp.status_code, resp.json())
 ```
+* `identifier` — email пользователя или его UUID.
+* `X-API-Key` — значение `webBasePath` самой панели.
 
-**Заголовки:**
 
-* `Content-Type: application/json`
-* `X-API-Key: <ваш API_KEY из .env>`
-
-**Тело запроса:**
+Пример ответа
 
 ```json
 {
-  "identifier": "6641696567"   // email или UUID
+    "status": "ok",
+    "uuid": "123e4567-e89b-12d3-a456-426614174000",
+    "email": "user@example.com",
+    "inbounds_deleted": 2,
+    "tables_deleted": ["inbounds"]
 }
 ```
 
-**Пример с `curl`:**
+* `status` — `"ok"` если удаление прошло успешно.
+* `uuid` — UUID пользователя.
+* `email` — email пользователя.
+* `inbounds_deleted` — количество удалённых inbound-записей.
+* `tables_deleted` — список таблиц, где данные пользователя были удалены.
 
-```bash
-curl -X DELETE http://127.0.0.1:8000/delete-client \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: super-secret-key" \
-  -d '{"identifier": "6641696567"}'
-```
 
-**Ответ:**
-
-* `200 OK` — если клиент удалён успешно.
-* `404 Not Found` — если клиент не найден.
-* `401 Unauthorized` — если неверный API ключ.
-
-### Просмотр логов
-
-```bash
-docker logs -f xui-cleaner
-```
-
-* `-f` — режим онлайн, новые строки отображаются автоматически.
-
-### Обновление сервиса
-
-1. Остановить старый контейнер:
-
-```bash
-docker stop xui-cleaner
-docker rm xui-cleaner
-```
-
-2. Собрать новый образ:
-
-```bash
-docker build -t xui-cleaner .
-```
-
-3. Запустить заново (как выше).
