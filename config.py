@@ -2,8 +2,6 @@ import sqlite3
 
 DB_PATH = "/etc/x-ui/x-ui.db"
 
-DB_PATH = "x-ui.db"
-
 
 
 conn = sqlite3.connect(DB_PATH)
