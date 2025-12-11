@@ -31,10 +31,10 @@ fi
 cd X-ui-cleaner || exit
 
 
-docker build -t xui-cleaner .
+sudo docker build -t xui-cleaner .
 
 
-docker run -d \
+sudo docker run -d \
   --name xui-cleaner \
   -p 8000:8000 \
   -v /etc/x-ui:/etc/x-ui \
@@ -42,3 +42,4 @@ docker run -d \
   xui-cleaner
 
 echo "Done!"
+exit 0
