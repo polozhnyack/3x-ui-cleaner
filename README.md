@@ -7,7 +7,7 @@
 Развертывание происходит одной командой:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/polozhnyack/X-ui-cleaner/main/deploy.sh | bash
+sudo curl -fsSL https://raw.githubusercontent.com/polozhnyack/X-ui-cleaner/main/deploy.sh | bash
 ```
 
 Сервис развертывается на **порту 8000**.
